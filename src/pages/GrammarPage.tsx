@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { GroqService, type GrammarIssue } from '../services/groq';
 import { Sparkles, Check, X, Copy, AlertCircle, Wand2, RefreshCw, ArrowRight } from 'lucide-react';
@@ -106,7 +106,6 @@ export const GrammarPage: React.FC = () => {
     const renderHighlightedText = () => {
         if (!text) return null;
 
-        let lastIndex = 0;
         const elements: React.ReactNode[] = [];
 
         const ranges: { start: number, end: number, type: string }[] = [];

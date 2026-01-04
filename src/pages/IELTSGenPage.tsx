@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { GroqService, type IELTSGenResult } from '../services/groq';
-import { BookOpen, Send, AlertCircle, Copy, Check, Sparkles, RefreshCw, Target, Link, Languages, PenTool } from 'lucide-react';
+import { BookOpen, AlertCircle, Copy, Check, Sparkles, RefreshCw, Target, Link, Languages, PenTool } from 'lucide-react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import ReactMarkdown from 'react-markdown';
