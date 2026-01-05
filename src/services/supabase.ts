@@ -31,22 +31,28 @@ export class SupabaseService {
         }));
     }
 
-    async addWord(item: VocabItem): Promise<void> {
+    async addWords(items: VocabItem[]): Promise<void> {
         const { error } = await this.client
             .from('vocabulary')
-            .upsert({
-                id: item.id,
-                word: item.word,
-                definition: item.definition,
-                example: item.example,
-                ipa: item.ipa,
-                mastery: item.mastery,
-                attempts: item.attempts,
-                correct: item.correct,
-                last_practiced: item.lastPracticed
-            });
+            .upsert(
+                items.map(item => ({
+                    id: item.id,
+                    word: item.word,
+                    definition: item.definition,
+                    example: item.example,
+                    ipa: item.ipa,
+                    mastery: item.mastery,
+                    attempts: item.attempts,
+                    correct: item.correct,
+                    last_practiced: item.lastPracticed
+                }))
+            );
 
         if (error) throw error;
+    }
+
+    async addWord(item: VocabItem): Promise<void> {
+        await this.addWords([item]);
     }
 
     async deleteWord(word: string): Promise<void> {

@@ -1,7 +1,5 @@
 import { create } from 'zustand';
-import { get, set, del } from 'idb-keyval';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { StateStorage } from 'zustand/middleware';
 import { SupabaseService } from '../services/supabase';
 
 export interface VocabItem {
@@ -63,19 +61,8 @@ interface AppState {
     getDetailedList: () => VocabItem[];
 }
 
-// Custom storage adapter for IndexedDB with migration support
-const storage: StateStorage = {
-    getItem: async (name: string): Promise<string | null> => {
-        const value = await get(name);
-        return value || null;
-    },
-    setItem: async (name: string, value: string): Promise<void> => {
-        await set(name, value);
-    },
-    removeItem: async (name: string): Promise<void> => {
-        await del(name);
-    },
-};
+// LocalStorage is used by default with createJSONStorage if no storage is passed,
+// but we'll make it explicit for clarity.
 
 const PRICING: Record<string, { input: number, output: number }> = {
     'llama-3.1-8b-instant': { input: 0.05, output: 0.08 },
@@ -131,10 +118,8 @@ export const useStore = create<AppState>()(
                 if (state.supabaseUrl && state.supabaseKey) {
                     try {
                         const supabase = new SupabaseService(state.supabaseUrl, state.supabaseKey);
-                        for (const item of details) {
-                            const currentItem = get().vocabDetails[item.word.toLowerCase()];
-                            await supabase.addWord(currentItem);
-                        }
+                        const itemsToSync = details.map(item => get().vocabDetails[item.word.toLowerCase()]);
+                        await supabase.addWords(itemsToSync);
                     } catch (err) {
                         console.error('Failed to sync with Supabase:', err);
                     }
@@ -290,7 +275,7 @@ export const useStore = create<AppState>()(
         }),
         {
             name: 'english-app-storage-v2',
-            storage: createJSONStorage(() => storage),
+            storage: createJSONStorage(() => localStorage),
         }
     )
 );
